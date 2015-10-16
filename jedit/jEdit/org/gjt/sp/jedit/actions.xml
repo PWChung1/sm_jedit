@@ -409,6 +409,12 @@
 	</CODE>
 </ACTION>
 
+<ACTION NAME="toggle-scrollbars">
+	<CODE>
+		textArea.toggleScrollBars();
+	</CODE>
+</ACTION>
+
 <ACTION NAME="goto-marker" NO_REPEAT="TRUE" NO_RECORD="TRUE">
 	<CODE>
 		view.getInputHandler().readNextChar(
