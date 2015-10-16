@@ -5323,6 +5323,14 @@ loop:		for(int i = lineNo - 1; i >= 0; i--)
 		return true;
 	} //}}}
 
+	protected JScrollBar getVerticleScrollBar() {
+		return this.vertical;
+	}
+	
+	protected JScrollBar getHorizontalScrollBar() {
+		return this.horizontal;
+	}
+	
 	//{{{ insert() method
 	protected void insert(String str, boolean indent)
 	{

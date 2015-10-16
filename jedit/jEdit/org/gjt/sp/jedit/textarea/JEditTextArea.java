@@ -217,6 +217,20 @@ public class JEditTextArea extends TextArea
 		}
 	} //}}}
 
+	/* Hides the verticle and horizontal scroll bars*/
+	public void toggleScrollBars() {
+		//check if scrollbar is visible before hiding
+		if(getVerticleScrollBar().isVisible())
+			getVerticleScrollBar().setVisible(false);
+		else
+			getVerticleScrollBar().setVisible(true);
+		
+		if(getHorizontalScrollBar().isVisible())
+			getHorizontalScrollBar().setVisible(false);
+		else 
+			getHorizontalScrollBar().setVisible(true);
+	}
+	
 	//{{{ userInput() method
 	/**
 	 * Handles the insertion of the specified character. It performs the
