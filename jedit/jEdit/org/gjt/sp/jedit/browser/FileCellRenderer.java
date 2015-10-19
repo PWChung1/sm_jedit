@@ -104,7 +104,17 @@ public class FileCellRenderer extends DefaultTableCellRenderer
 				setBorder(new ExpansionToggleBorder(
 					state,entry.level));
 			}
-			else
+			else if (column == 1)			// Changes for CR3
+			{
+				VFSDirectoryEntryTableModel model = (VFSDirectoryEntryTableModel)table.getModel();
+				String extAttr = model.getExtendedAttribute(column);
+
+				openBuffer = false;
+				setIcon(null);
+				setText(file.getExtendedAttribute(extAttr));
+				setBorder(new EmptyBorder(1,1,1,1));
+			}
+			else 
 			{
 				VFSDirectoryEntryTableModel model = (VFSDirectoryEntryTableModel)table.getModel();
 				String extAttr = model.getExtendedAttribute(column);

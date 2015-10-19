@@ -2317,6 +2317,7 @@ vfs.browser.collapse.icon=16x16/actions/group-collapse.png
 
 vfs.browser.name=Name
 vfs.browser.type=Type
+vfs.browser.creation.date=Creation Date
 vfs.browser.type.file=File
 vfs.browser.type.directory=Directory
 vfs.browser.type.filesystem=File system

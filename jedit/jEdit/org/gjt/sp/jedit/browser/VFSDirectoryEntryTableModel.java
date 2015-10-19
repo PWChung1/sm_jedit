@@ -24,7 +24,15 @@ package org.gjt.sp.jedit.browser;
 
 //{{{ Imports
 import javax.swing.table.*;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.*;
+
 import org.gjt.sp.jedit.io.FileVFS;
 import org.gjt.sp.jedit.io.VFS;
 import org.gjt.sp.jedit.io.VFSFile;
@@ -183,7 +191,9 @@ public class VFSDirectoryEntryTableModel extends AbstractTableModel
 	{
 		if(col == 0)
 			return jEdit.getProperty("vfs.browser.name");
-		else
+		else if (col == 1) 	// Change made for CR3
+			return jEdit.getProperty("vfs.browser." + getExtendedAttribute(col));
+		else 
 			return jEdit.getProperty("vfs.browser." + getExtendedAttribute(col));
 	} //}}}
 
@@ -356,6 +366,8 @@ vfs_attr_loop:	for(int i = 0; i < attrs.length; i++)
 		Entry parent;
 		// file extension
 		String extension;
+		// file creation date - CR3
+		FileTime fileCreationDate;
 
 		Entry(VFSFile dirEntry, int level, Entry parent)
 		{
@@ -368,6 +380,18 @@ vfs_attr_loop:	for(int i = 0; i < attrs.length; i++)
 			this.dirEntry = dirEntry;
 			this.level = level;
 			this.extension = MiscUtilities.getFileExtension(dirEntry.getName());
+
+			BasicFileAttributes attr = null;			//Changes for CR3
+			try {
+				File file = new File(dirEntry.path);
+				if(file.isFile()) {
+					attr = Files.readAttributes(Paths.get(dirEntry.path), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+					this.fileCreationDate = attr.creationTime();
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		
@@ -461,6 +485,9 @@ vfs_attr_loop:	for(int i = 0; i < attrs.length; i++)
 					entry1.extension,
 					entry2.extension,
 					sortIgnoreCase);
+			// Sort by creation date - CR3
+			else if(sortAttribute == VFS.EA_CREATION_DATE)
+				result = entry1.fileCreationDate.compareTo(entry2.fileCreationDate);
 			// default: sort by name
 			else
 				result = StandardUtilities.compareStrings(

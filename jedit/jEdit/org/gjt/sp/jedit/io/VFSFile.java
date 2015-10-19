@@ -26,12 +26,23 @@ package org.gjt.sp.jedit.io;
 //{{{ Imports
 import java.awt.Color;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.gjt.sp.jedit.*;
 import org.gjt.sp.jedit.browser.VFSBrowser;
 import org.gjt.sp.jedit.browser.FileCellRenderer;
 import org.gjt.sp.util.Log;
 import org.gjt.sp.util.IOUtilities;
 
+import javax.naming.directory.BasicAttribute;
 import javax.swing.*;
 //}}}
 
@@ -425,6 +436,21 @@ public class VFSFile implements Serializable
 			default:
 				throw new IllegalArgumentException();
 			}
+		}
+		else if(name.equals(VFS.EA_CREATION_DATE)) 	// Change for CR3
+		{
+			BasicFileAttributes attr = null;
+			FileTime date = null;
+			try {
+				attr = Files.readAttributes(Paths.get(path), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+				date = attr.creationTime();
+				} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			String dateCreated = df.format(date.toMillis());
+			return dateCreated;
 		}
 		else if(name.equals(VFS.EA_STATUS))
 		{
