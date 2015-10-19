@@ -174,6 +174,11 @@ public abstract class VFS
 	public static final String EA_TYPE = "type";
 
 	/**
+	 * Creation Date 
+	 */
+	public static final String EA_CREATION_DATE = "creation.date";		// Changes for CR3
+	
+	/**
 	 * File status (read only, read write, etc).
 	 * @since jEdit 4.2pre1
 	 */
@@ -215,7 +220,7 @@ public abstract class VFS
 		this.name = name;
 		this.caps = caps;
 		// reasonable defaults (?)
-		this.extAttrs = new String[] { EA_SIZE, EA_TYPE };
+		this.extAttrs = new String[] { EA_SIZE, EA_TYPE, EA_CREATION_DATE }; // Change for CR3
 	}
 
 	/**
