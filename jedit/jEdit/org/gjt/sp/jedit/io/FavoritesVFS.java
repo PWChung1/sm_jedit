@@ -45,8 +45,9 @@ public class FavoritesVFS extends VFS
 	//{{{ FavoritesVFS constructor
 	public FavoritesVFS()
 	{
+		// Add creation date to the favorites table as extended attribute - CR3
 		super("favorites",DELETE_CAP | LOW_LATENCY_CAP,
-			new String[] { EA_TYPE });
+			new String[] { EA_TYPE, EA_CREATION_DATE });
 
 		/* addToFavorites(), which is a static method
 		 * (for convinience) needs an instance of the
@@ -196,6 +197,8 @@ public class FavoritesVFS extends VFS
 		public String getExtendedAttribute(String name)
 		{
 			if(name.equals(EA_TYPE))
+				return super.getExtendedAttribute(name);
+			else if (name.equals(EA_CREATION_DATE))		// Return creation date - CR3
 				return super.getExtendedAttribute(name);
 			else
 			{
