@@ -344,6 +344,11 @@ public abstract class Selection implements Cloneable
 			return changed;
 		} //}}}
 
+		public void rangeComment(String commentEnd, String commentStart, TextArea textArea) {
+			textArea.getBuffer().insert(this.start, commentStart);
+			textArea.getBuffer().insert(this.end, commentEnd);
+		}
+
 		//}}}
 	} //}}}
 
@@ -760,6 +765,17 @@ public abstract class Selection implements Cloneable
 				return buffer.getLineStartOffset(line) + returnValue;
 		} //}}}
 
+		public void rangeComment(String commentEnd, String commentStart, TextArea textArea) {
+			int start = this.getStartColumn(textArea.getBuffer());
+			int end = this.getEndColumn(textArea.getBuffer());
+			for (int j = this.startLine; j <= this.endLine; j++) {
+				textArea.getBuffer().insertAtColumn(j, end, commentEnd);
+				textArea.getBuffer().insertAtColumn(j, start, commentStart);
+			}
+		}
+
 		//}}}
 	} //}}}
+
+	public abstract void rangeComment(String commentEnd, String commentStart, TextArea textArea);
 }

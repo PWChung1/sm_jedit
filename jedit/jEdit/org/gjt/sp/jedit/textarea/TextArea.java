@@ -4101,25 +4101,7 @@ loop:		for(int i = lineNo - 1; i >= 0; i--)
 			for(int i = 0; i < selection.length; i++)
 			{
 				Selection s = selection[i];
-				if(s instanceof Selection.Range)
-				{
-					buffer.insert(s.start,commentStart);
-					buffer.insert(s.end,commentEnd);
-				}
-				else if(s instanceof Selection.Rect)
-				{
-					Selection.Rect rect = (Selection.Rect)s;
-					int start = rect.getStartColumn(buffer);
-					int end = rect.getEndColumn(buffer);
-
-					for(int j = s.startLine; j <= s.endLine; j++)
-					{
-						buffer.insertAtColumn(j,end,
-							commentEnd);
-						buffer.insertAtColumn(j,start,
-							commentStart);
-					}
-				}
+				s.rangeComment(commentEnd, commentStart, this);
 			}
 
 			selectNone();
@@ -5323,14 +5305,6 @@ loop:		for(int i = lineNo - 1; i >= 0; i--)
 		return true;
 	} //}}}
 
-	protected JScrollBar getVerticleScrollBar() {
-		return this.vertical;
-	}
-	
-	protected JScrollBar getHorizontalScrollBar() {
-		return this.horizontal;
-	}
-	
 	//{{{ insert() method
 	protected void insert(String str, boolean indent)
 	{
