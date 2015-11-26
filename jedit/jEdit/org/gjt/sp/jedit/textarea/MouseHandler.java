@@ -35,7 +35,7 @@ import org.gjt.sp.jedit.msg.PositionChanging;
 /** The mouseHandler used for jEdit.
  *
  */
-public class MouseHandler extends TextAreaMouseHandler
+public class MouseHandler extends MouseHandlerBase
 {
 	//{{{ MouseHandler constructor
 	public MouseHandler(JEditTextArea textArea)
@@ -44,90 +44,114 @@ public class MouseHandler extends TextAreaMouseHandler
 		this.textArea = textArea;
 	} //}}}
 
+	@Override
+	protected void mouseHandlerRectangularSelection() {
+		ctrlForRectangularSelection = textArea.isCtrlForRectangularSelection();
+	}
+	
+	@Override
+	protected void mouseHandlerEditBus()
+	{
+		EditBus.send(new PositionChanging(textArea));
+	}
+	
+	@Override
+	protected void mouseHandlerTextArea(MouseEvent evt) {
+		if(isPopupTrigger(evt)
+				&& textArea.getRightClickPopup() != null)
+			{
+				if(textArea.isRightClickPopupEnabled())
+					textArea.handlePopupTrigger(evt);
+				return;
+			}
+	}
+	
 	//{{{ mousePressed() method
 	@Override
 	public void mousePressed(MouseEvent evt)
 	{
-		showCursor();
-
-		control = (OperatingSystem.isMacOS() && evt.isMetaDown())
-			|| (!OperatingSystem.isMacOS() && evt.isControlDown());
-
-		ctrlForRectangularSelection = textArea.isCtrlForRectangularSelection();
-
-		// so that Home <mouse click> Home is not the same
-		// as pressing Home twice in a row
-		textArea.getInputHandler().resetLastActionCount();
-
-		quickCopyDrag = (textArea.isQuickCopyEnabled() &&
-			isMiddleButton(evt.getModifiers()));
-
-		if(!quickCopyDrag)
-		{
-			textArea.requestFocus();
-			TextArea.focusedComponent = textArea;
-		}
-
-		if(textArea.getBuffer().isLoading())
-			return;
-		EditBus.send(new PositionChanging(textArea));
-		int x = evt.getX();
-		int y = evt.getY();
-
-		dragStart = textArea.xyToOffset(x,y,
-			!(textArea.getPainter().isBlockCaretEnabled()
-			|| textArea.isOverwriteEnabled()));
-		dragStartLine = textArea.getLineOfOffset(dragStart);
-		dragStartOffset = dragStart - textArea.getLineStartOffset(
-			dragStartLine);
-
-		if(isPopupTrigger(evt)
-			&& textArea.getRightClickPopup() != null)
-		{
-			if(textArea.isRightClickPopupEnabled())
-				textArea.handlePopupTrigger(evt);
-			return;
-		}
-
-		dragged = false;
-
-		textArea.blink = true;
-		textArea.invalidateLine(textArea.getCaretLine());
-
-		clickCount = evt.getClickCount();
-
-		if(textArea.isDragEnabled()
-			&& textArea.selectionManager.insideSelection(x,y)
-			&& clickCount == 1 && !evt.isShiftDown())
-		{
-			maybeDragAndDrop = true;
-
-			textArea.moveCaretPosition(dragStart,false);
-			return;
-		}
-
-		maybeDragAndDrop = false;
-
-		if(quickCopyDrag)
-		{
-			// ignore double clicks of middle button
-			doSingleClick(evt);
-		}
-		else
-		{
-			switch(clickCount)
-			{
-			case 1:
-				doSingleClick(evt);
-				break;
-			case 2:
-				doDoubleClick();
-				break;
-			default: //case 3:
-				doTripleClick();
-				break;
-			}
-		}
+		super.mousePressed(evt);
+		
+//		showCursor();
+//
+//		control = (OperatingSystem.isMacOS() && evt.isMetaDown())
+//			|| (!OperatingSystem.isMacOS() && evt.isControlDown());
+//
+//		ctrlForRectangularSelection = textArea.isCtrlForRectangularSelection();
+//
+//		// so that Home <mouse click> Home is not the same
+//		// as pressing Home twice in a row
+//		textArea.getInputHandler().resetLastActionCount();
+//
+//		quickCopyDrag = (textArea.isQuickCopyEnabled() &&
+//			isMiddleButton(evt.getModifiers()));
+//
+//		if(!quickCopyDrag)
+//		{
+//			textArea.requestFocus();
+//			TextArea.focusedComponent = textArea;
+//		}
+//
+//		if(textArea.getBuffer().isLoading())
+//			return;
+//		EditBus.send(new PositionChanging(textArea));
+//		int x = evt.getX();
+//		int y = evt.getY();
+//
+//		dragStart = textArea.xyToOffset(x,y,
+//			!(textArea.getPainter().isBlockCaretEnabled()
+//			|| textArea.isOverwriteEnabled()));
+//		dragStartLine = textArea.getLineOfOffset(dragStart);
+//		dragStartOffset = dragStart - textArea.getLineStartOffset(
+//			dragStartLine);
+//
+//		if(isPopupTrigger(evt)
+//			&& textArea.getRightClickPopup() != null)
+//		{
+//			if(textArea.isRightClickPopupEnabled())
+//				textArea.handlePopupTrigger(evt);
+//			return;
+//		}
+//
+//		dragged = false;
+//
+//		textArea.blink = true;
+//		textArea.invalidateLine(textArea.getCaretLine());
+//
+//		clickCount = evt.getClickCount();
+//
+//		if(textArea.isDragEnabled()
+//			&& textArea.selectionManager.insideSelection(x,y)
+//			&& clickCount == 1 && !evt.isShiftDown())
+//		{
+//			maybeDragAndDrop = true;
+//
+//			textArea.moveCaretPosition(dragStart,false);
+//			return;
+//		}
+//
+//		maybeDragAndDrop = false;
+//
+//		if(quickCopyDrag)
+//		{
+//			// ignore double clicks of middle button
+//			doSingleClick(evt);
+//		}
+//		else
+//		{
+//			switch(clickCount)
+//			{
+//			case 1:
+//				doSingleClick(evt);
+//				break;
+//			case 2:
+//				doDoubleClick();
+//				break;
+//			default: //case 3:
+//				doTripleClick();
+//				break;
+//			}
+//		}
 	} //}}}
 
 	//{{{ mouseReleased() method
@@ -150,7 +174,7 @@ public class MouseHandler extends TextAreaMouseHandler
 			}
 		}
 		else if(!dragged && textArea.isQuickCopyEnabled() &&
-			isMiddleButton(evt.getModifiers()))
+			TextAreaMouseHandler.isMiddleButton(evt.getModifiers()))
 		{
 			textArea.requestFocus();
 			TextArea.focusedComponent = textArea;
